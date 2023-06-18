@@ -36,6 +36,9 @@ module.exports = (env, { mode }) => {
           NODE_ENV: JSON.stringify(mode),
         },
       }),
+      new webpack.ProvidePlugin({
+        Buffer: ["buffer", "Buffer"],
+      }),
     ],
 
     module: {
