@@ -1,4 +1,4 @@
-const regexParameter = /{{([\w\d-]+)}}/;
+const regexParameter = /{<([\w\d-]+)>}/;
 
 export const getVariablesObject = (table: HTMLTableElement, parameters: Set<string>) => {
   const variables: { [a: string]: string } = {};
@@ -8,9 +8,9 @@ export const getVariablesObject = (table: HTMLTableElement, parameters: Set<stri
     const keyArray = key.split("-");
     const cell = keyArray[1];
     const row = keyArray[2];
-    variables[key] = (table.rows[row].cells[cell].innerHTML as string)
-      .replaceAll("<br>", "#ENTER#")
-      .replaceAll(/<[^>]+>/g, "");
+    const value = (table.rows[row].cells[cell].innerHTML as string).replaceAll("<br>", "\n").replaceAll(/<[^>]+>/g, "");
+    if (value && value.split("\n").join("")) variables[key] = value;
+    else variables[key] = "";
   });
 
   return variables;

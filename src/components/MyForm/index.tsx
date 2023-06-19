@@ -4,12 +4,12 @@ import PizZip from "pizzip";
 import React, { ChangeEvent, FC, FormEvent, useState } from "react";
 import { Alert, Button, Form, Spinner } from "react-bootstrap";
 
-import { generateFile } from "@root/utils/generateFile";
+import { generateFileDocxTemplater } from "@root/utils/generateFileDocxTemplater";
 import { getSheetsID } from "@root/utils/getSheetsID";
 
 const MyForm: FC = () => {
   const [inputValue, setInputValue] = useState("");
-  const [fileArrayBuffer, setFileArrayBuffer] = useState<ArrayBuffer | string>("");
+  const [fileDoc, setFileDoc] = useState<Docxtemplater<PizZip> | string>("");
   const [fileText, setFileText] = useState("");
 
   const [alertMessage, setAlertMessage] = useState("");
@@ -27,11 +27,16 @@ const MyForm: FC = () => {
     reader.readAsArrayBuffer(file);
     reader.onload = () => {
       if (reader.result) {
-        setFileArrayBuffer(reader.result);
-        const doc = new Docxtemplater(new PizZip(reader.result as string | ArrayBuffer), {
+        const doc1 = new Docxtemplater(new PizZip(reader.result as string | ArrayBuffer), {
           delimiters: { start: "12op1j2po1j2poj1po", end: "op21j4po21jp4oj1op24j" },
         });
-        setFileText(doc.getFullText());
+        const doc = new Docxtemplater(new PizZip(reader.result as string | ArrayBuffer), {
+          delimiters: { start: "{<", end: ">}" },
+          paragraphLoop: true,
+          linebreaks: true,
+        });
+        setFileDoc(doc);
+        setFileText(doc1.getFullText());
       }
     };
   };
@@ -41,10 +46,10 @@ const MyForm: FC = () => {
     event.stopPropagation();
     setLoadingFileStatus(true);
     const id = getSheetsID(inputValue);
-    if (!id || !fileArrayBuffer || typeof fileArrayBuffer === "string" || !fileText) {
+    if (!id || !fileDoc || typeof fileDoc === "string" || !fileText) {
       setAlertMessage("Неправильный формат данных!");
       setLoadingFileStatus(false);
-    } else generateFile(id, fileArrayBuffer, fileText).then(() => setLoadingFileStatus(false));
+    } else generateFileDocxTemplater(id, fileDoc, fileText).then(() => setLoadingFileStatus(false));
   };
   return (
     <>
