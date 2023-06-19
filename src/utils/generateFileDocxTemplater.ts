@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import Docxtemplater from "docxtemplater";
 import saveAs from "file-saver";
 
@@ -10,9 +9,6 @@ export const generateFileDocxTemplater = async (id: string, fileDoc: Docxtemplat
   const table = await getTable(id);
   const parameters = getParameters(text);
   const variables = getVariablesObject(table, parameters);
-  console.log(table);
-  console.log(parameters);
-  console.log(variables);
   fileDoc.setData(variables);
   fileDoc.render();
   const doc = fileDoc.getZip().generate({
