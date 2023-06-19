@@ -2,7 +2,7 @@
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 import React, { ChangeEvent, FC, FormEvent, useState } from "react";
-import { Alert, Button, Form } from "react-bootstrap";
+import { Alert, Button, Form, Spinner } from "react-bootstrap";
 
 import { generateFile } from "@root/utils/generateFile";
 import { getSheetsID } from "@root/utils/getSheetsID";
@@ -13,6 +13,7 @@ const MyForm: FC = () => {
   const [fileText, setFileText] = useState("");
 
   const [alertMessage, setAlertMessage] = useState("");
+  const [loadingFileStatus, setLoadingFileStatus] = useState(false);
 
   const handleChangeLink = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -38,10 +39,12 @@ const MyForm: FC = () => {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    setLoadingFileStatus(true);
     const id = getSheetsID(inputValue);
-    if (!id || !fileArrayBuffer || typeof fileArrayBuffer === "string" || !fileText)
+    if (!id || !fileArrayBuffer || typeof fileArrayBuffer === "string" || !fileText) {
       setAlertMessage("Неправильный формат данных!");
-    else generateFile(id, fileArrayBuffer, fileText);
+      setLoadingFileStatus(false);
+    } else generateFile(id, fileArrayBuffer, fileText).then(() => setLoadingFileStatus(false));
   };
   return (
     <>
@@ -61,8 +64,12 @@ const MyForm: FC = () => {
         </Form.Group>
         <div className="mb-3 d-flex justify-content-end">
           <div className="d-flex flex-column gap-3 col-md-3">
-            <Button variant="primary" type="submit">
-              Получить файл
+            <Button variant="primary" type="submit" disabled={loadingFileStatus}>
+              {loadingFileStatus ? (
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+              ) : (
+                "Получить файл"
+              )}
             </Button>
           </div>
         </div>
