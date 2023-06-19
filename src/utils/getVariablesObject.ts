@@ -8,7 +8,12 @@ export const getVariablesObject = (table: HTMLTableElement, parameters: Set<stri
     const keyArray = key.split("-");
     const cell = keyArray[1];
     const row = keyArray[2];
-    const value = (table.rows[row].cells[cell].innerHTML as string).replaceAll("<br>", "\n").replaceAll(/<[^>]+>/g, "");
+    const value = (table.rows[row].cells[cell].innerHTML as string)
+      .replaceAll("<br>", "\n")
+      .replaceAll(/<[^>]+>/g, "")
+      .split("\n")
+      .filter((item) => item)
+      .join("\n");
     if (value && value.split("\n").join("")) variables[key] = value;
     else variables[key] = "";
   });
