@@ -1,11 +1,14 @@
 import Docxtemplater from "docxtemplater";
-import saveAs from "file-saver";
 
 import { getParameters } from "./getParameters";
 import { getTable } from "./getTable";
 import { getVariablesObject } from "./getVariablesObject";
 
-export const generateFileDocxTemplater = async (id: string, fileDoc: Docxtemplater<PizZip>, text: string) => {
+export const generateFileDocxTemplater = async (
+  id: string,
+  fileDoc: Docxtemplater<PizZip>,
+  text: string
+): Promise<Blob> => {
   const table = await getTable(id);
   const parameters = getParameters(text);
   const variables = getVariablesObject(table, parameters);
@@ -15,5 +18,8 @@ export const generateFileDocxTemplater = async (id: string, fileDoc: Docxtemplat
     type: "blob",
     mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   });
-  saveAs(doc, "ex.docx");
+  return doc;
+  // const arrayBuffer = await doc.arrayBuffer();
+  // const html = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+  // saveAs(doc, "ex.docx");
 };

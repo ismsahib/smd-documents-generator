@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
 import Docxtemplater from "docxtemplater";
+import { saveAs } from "file-saver";
 import PizZip from "pizzip";
 import React, { ChangeEvent, FC, FormEvent, useState } from "react";
 import { Alert, Button, Form, Spinner } from "react-bootstrap";
 
+import MyModal from "../MyModal";
 import { generateFileDocxTemplater } from "@root/utils/generateFileDocxTemplater";
 import { getSheetsID } from "@root/utils/getSheetsID";
 
@@ -11,9 +13,11 @@ const MyForm: FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [fileDoc, setFileDoc] = useState<Docxtemplater<PizZip> | string>("");
   const [fileText, setFileText] = useState("");
+  const [resultDoc, setResultDoc] = useState<Blob | string>("");
 
   const [alertMessage, setAlertMessage] = useState("");
   const [loadingFileStatus, setLoadingFileStatus] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
 
   const handleChangeLink = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -40,16 +44,27 @@ const MyForm: FC = () => {
       }
     };
   };
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleGenerateFile = async () => {
     setLoadingFileStatus(true);
     const id = getSheetsID(inputValue);
     if (!id || !fileDoc || typeof fileDoc === "string" || !fileText) {
       setAlertMessage("Неправильный формат данных!");
       setLoadingFileStatus(false);
-    } else generateFileDocxTemplater(id, fileDoc, fileText).then(() => setLoadingFileStatus(false));
+    } else {
+      const docx = await generateFileDocxTemplater(id, fileDoc, fileText);
+      setResultDoc(docx);
+      setLoadingFileStatus(false);
+    }
+  };
+  const handlePreview = async () => {
+    if (typeof resultDoc === "string") return;
+    setModalShow(true);
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    saveAs(resultDoc, "ex.docx");
   };
   return (
     <>
@@ -69,12 +84,22 @@ const MyForm: FC = () => {
         </Form.Group>
         <div className="mb-3 d-flex justify-content-end">
           <div className="d-flex flex-column gap-3 col-md-3">
-            <Button variant="primary" type="submit" disabled={loadingFileStatus}>
+            <Button variant="primary" disabled={loadingFileStatus} onClick={handleGenerateFile}>
               {loadingFileStatus ? (
                 <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
               ) : (
-                "Получить файл"
+                "Сгенерировать файл"
               )}
+            </Button>
+            <Button
+              variant="primary"
+              disabled={loadingFileStatus || typeof resultDoc === "string"}
+              onClick={handlePreview}
+            >
+              Предварительный просмотр
+            </Button>
+            <Button variant="primary" type="submit" disabled={loadingFileStatus || typeof resultDoc === "string"}>
+              Получить файл
             </Button>
           </div>
         </div>
@@ -84,6 +109,7 @@ const MyForm: FC = () => {
           {alertMessage}
         </Alert>
       )}
+      {modalShow && <MyModal modalShow={modalShow} setModalShow={setModalShow} modalData={resultDoc} />}
     </>
   );
 };
