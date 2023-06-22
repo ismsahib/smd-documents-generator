@@ -24,7 +24,7 @@ module.exports = (env, { mode }) => {
     plugins: [
       new HtmlWebpackPlugin({
         template: path.join(__dirname, "src", "index.html"),
-        favicon: path.join(__dirname, "src", "assets/images/favicon.ico"),
+        favicon: path.join(__dirname, "src", "assets/images/favicon.png"),
       }),
 
       new MiniCssExtractPlugin({
