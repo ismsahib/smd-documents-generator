@@ -11,7 +11,7 @@ import { getSheetsID } from "@root/utils/getSheetsID";
 
 const MyForm: FC = () => {
   const [inputValue, setInputValue] = useState("");
-  const [fileDoc, setFileDoc] = useState<Docxtemplater<PizZip> | string>("");
+  const [fileDoc, setFileDoc] = useState<ArrayBuffer | string>("");
   const [fileText, setFileText] = useState("");
   const [resultDoc, setResultDoc] = useState<Blob | string>("");
 
@@ -34,12 +34,12 @@ const MyForm: FC = () => {
         const doc1 = new Docxtemplater(new PizZip(reader.result as string | ArrayBuffer), {
           delimiters: { start: "12op1j2po1j2poj1po", end: "op21j4po21jp4oj1op24j" },
         });
-        const doc = new Docxtemplater(new PizZip(reader.result as string | ArrayBuffer), {
-          delimiters: { start: "{<", end: ">}" },
-          paragraphLoop: true,
-          linebreaks: true,
-        });
-        setFileDoc(doc);
+        // const doc = new Docxtemplater(new PizZip(reader.result as string | ArrayBuffer), {
+        //   delimiters: { start: "{<", end: ">}" },
+        //   paragraphLoop: true,
+        //   linebreaks: true,
+        // });
+        setFileDoc(reader.result);
         setFileText(doc1.getFullText());
       }
     };
