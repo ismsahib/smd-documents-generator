@@ -6,8 +6,6 @@ export const replaceImagesValues = async (
 ): Promise<Blob> => {
   const patches = {};
   for (const [key, value] of Object.entries(imagesVariables)) {
-    let width: number;
-    let height: number;
     const response = await fetch(value);
     const image = await response.blob();
     const imageArrayBuffer = await image.arrayBuffer();
@@ -18,14 +16,12 @@ export const replaceImagesValues = async (
       newImage.src = reader.result as string;
       newImage.onload = (eventImage: ProgressEvent<HTMLImageElement> | Event) => {
         const currentImage = eventImage.target as HTMLImageElement;
-        width = currentImage.width;
-        height = currentImage.height;
         patches[key] = {
           type: PatchType.PARAGRAPH,
           children: [
             new ImageRun({
               data: imageArrayBuffer,
-              transformation: { width: width, height: height },
+              transformation: { width: currentImage.width, height: currentImage.height },
             }),
           ],
         };
