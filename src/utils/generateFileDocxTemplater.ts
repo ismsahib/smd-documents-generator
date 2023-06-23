@@ -2,6 +2,7 @@ import { getParameters } from "./getParameters";
 import { getTable } from "./getTable";
 import { getVariablesObject } from "./getVariablesObject";
 import { replaceImagesValues } from "./replaceImagesValues";
+import { replaceTablesValues } from "./replaceTablesValues";
 import { replaceTextsValues } from "./replaceTextsValues";
 
 export const generateFileDocxTemplater = async (id: string, fileDoc: ArrayBuffer, text: string): Promise<Blob> => {
@@ -15,6 +16,11 @@ export const generateFileDocxTemplater = async (id: string, fileDoc: ArrayBuffer
     resultDocx
       ? (resultDocx = await replaceImagesValues(resultDocx, variables.images))
       : (resultDocx = await replaceImagesValues(fileDoc, variables.images));
+  if (variables.tables)
+    resultDocx
+      ? (resultDocx = await replaceTablesValues(resultDocx, variables.tables))
+      : (resultDocx = await replaceTablesValues(fileDoc, variables.tables));
+
   if (resultDocx) return resultDocx;
   else return new Blob([fileDoc]);
 };
