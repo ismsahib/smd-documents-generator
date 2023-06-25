@@ -25,5 +25,32 @@ export const getRows = (
       rows.push(currentRow);
     }
   }
-  return rows;
+
+  const emptyIndex: number[] = [];
+  for (let row = 0; row < rows.length; row++) {
+    for (let columns = 0; columns < rows[row].length; columns++) {
+      if (!rows[row][columns]) emptyIndex.push(columns);
+    }
+  }
+  const emptyIndexObj = emptyIndex.reduce((acc, i) => {
+    if (Object.keys(acc).includes(String(i))) {
+      acc[i] += 1;
+    } else {
+      acc[i] = 1;
+    }
+    return acc;
+  }, {});
+
+  const newRows = rows.map((row) =>
+    row.filter((column, columnIndex) => {
+      if (!column) {
+        if (emptyIndexObj[String(columnIndex)]) {
+          if (emptyIndexObj[String(columnIndex)] === rows.length) return false;
+          else return true;
+        } else return true;
+      } else return true;
+    })
+  );
+
+  return newRows;
 };

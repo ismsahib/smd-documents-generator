@@ -19,6 +19,7 @@ const createTable = (rows: string[][]): Table => {
                         text: cell,
                         bold: true,
                         size: `${12}pt`,
+                        highlight: "yellow",
                       }),
                     ],
                   }),
@@ -37,6 +38,7 @@ const createTable = (rows: string[][]): Table => {
                     new TextRun({
                       text: cell,
                       size: `${12}pt`,
+                      highlight: "yellow",
                     }),
                   ],
                 }),
