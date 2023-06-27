@@ -13,12 +13,14 @@ export const getVariablesObject = (
   }
 ): {
   texts: Record<string, string> | undefined;
-  images: Record<string, string> | undefined;
-  tables: Record<string, string[][]> | undefined;
+  images: Record<string, string | undefined> | undefined;
+  tables: Record<string, string[][] | undefined> | undefined;
 } => {
   const texts: { [a: string]: string } = {};
-  const images: { [a: string]: string } = {};
-  const tables: { [a: string]: string[][] } = {};
+  const images: { [a: string]: string | undefined } = {};
+  const tables: { [a: string]: string[][] | undefined } = {};
+  const maxRows = table.tBodies[0].rows.length;
+  const maxCells = table.rows[0].cells.length - 1;
 
   if (parameters.texts) {
     parameters.texts.forEach((parameter) => {
@@ -26,14 +28,16 @@ export const getVariablesObject = (
       const keyArray = key.split("-");
       const cell = keyArray[1];
       const row = keyArray[2];
-      const value = (table.rows[row].cells[cell].innerHTML as string)
-        .replaceAll("<br>", "\n")
-        .replaceAll(/<[^>]+>/g, "")
-        .split("\n")
-        .filter((item) => item)
-        .join("\n");
-      if (value && value.split("\n").join("")) texts[key] = value;
-      else texts[key] = "";
+      if (Number(cell) > 0 && Number(cell) <= maxCells && Number(row) > 0 && Number(row) <= maxRows) {
+        const value = (table.rows[row].cells[cell].innerHTML as string)
+          .replaceAll("<br>", "\n")
+          .replaceAll(/<[^>]+>/g, "")
+          .split("\n")
+          .filter((item) => item)
+          .join("\n");
+        if (value && value.split("\n").join("")) texts[key] = value;
+        else texts[key] = "";
+      } else texts[key] = "";
     });
   }
 
@@ -43,8 +47,11 @@ export const getVariablesObject = (
       const keyArray = key.split("-");
       const cell = keyArray[2];
       const row = keyArray[3];
-      const value = (table.rows[row].cells[cell].innerHTML as string).match(regexImageSrc);
-      if (value) images[key] = value[1];
+      if (Number(cell) > 0 && Number(cell) <= maxCells && Number(row) > 0 && Number(row) <= maxRows) {
+        const value = (table.rows[row].cells[cell].innerHTML as string).match(regexImageSrc);
+        if (value) images[key] = value[1];
+        else images[key] = undefined;
+      } else images[key] = undefined;
     });
   }
 
@@ -58,6 +65,7 @@ export const getVariablesObject = (
       const rowEnd = keyArray[5];
       const value = getRows(table, columnStart, rowStart, columnEnd, rowEnd);
       if (value) tables[key] = value;
+      else tables[key] = undefined;
     });
   }
   return {

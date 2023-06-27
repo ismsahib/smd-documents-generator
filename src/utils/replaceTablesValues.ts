@@ -52,11 +52,18 @@ const createTable = (rows: string[][]): Table => {
 
 export const replaceTablesValues = async (
   fileDoc: Blob | ArrayBuffer,
-  tablesVariables: Record<string, string[][]>
+  tablesVariables: Record<string, string[][] | undefined>
 ): Promise<Blob> => {
   const patches = {};
   for (const [key, value] of Object.entries(tablesVariables)) {
-    patches[key] = { type: PatchType.DOCUMENT, children: [createTable(value)] };
+    if (value) {
+      patches[key] = { type: PatchType.DOCUMENT, children: [createTable(value)] };
+    } else {
+      patches[key] = {
+        type: PatchType.PARAGRAPH,
+        children: [new TextRun("")],
+      };
+    }
   }
   const doc = await patchDocument(fileDoc, { patches: patches });
   return new Blob([doc]);
