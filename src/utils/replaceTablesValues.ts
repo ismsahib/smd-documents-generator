@@ -3,8 +3,8 @@ import { Paragraph, PatchType, Table, TableCell, TableRow, TextRun, WidthType, p
 const createTable = (rows: string[][]): Table => {
   return new Table({
     width: {
-      size: 10000,
-      type: WidthType.DXA,
+      size: 100,
+      type: WidthType.PERCENTAGE,
     },
     rows: rows.map((row, index) => {
       if (index === 0)

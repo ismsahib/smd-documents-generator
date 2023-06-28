@@ -34,7 +34,8 @@ export const getVariablesObject = (
           .replaceAll(/<[^>]+>/g, "")
           .split("\n")
           .filter((item) => item)
-          .join("\n");
+          .join("\n")
+          .replaceAll("&nbsp;", " ");
         if (value && value.split("\n").join("")) texts[key] = value;
         else texts[key] = "";
       } else texts[key] = "";
