@@ -1,3 +1,5 @@
+const regexImageSrc = /src="(.*?)"/;
+
 export const getRows = (
   table: HTMLTableElement,
   columnStart: string,
@@ -20,8 +22,13 @@ export const getRows = (
     const currentRow: string[] = [];
     for (let column = Number(columnStart); column <= Number(columnEnd); column++) {
       const cellTable = table.rows[row].cells[column];
-      if (cellTable) currentRow.push(cellTable.innerText);
-      else currentRow.push("");
+      if (cellTable) {
+        if (regexImageSrc.test(cellTable.innerHTML)) {
+          const regexArray = cellTable.innerHTML.match(regexImageSrc);
+          if (regexArray) currentRow.push(regexArray[1]);
+          else currentRow.push("");
+        } else currentRow.push(cellTable.innerText);
+      } else currentRow.push("");
     }
     if (currentRow.length && currentRow.join("")) {
       rows.push(currentRow);

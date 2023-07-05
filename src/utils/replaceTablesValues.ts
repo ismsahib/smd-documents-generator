@@ -1,52 +1,53 @@
-import { Paragraph, PatchType, Table, TableCell, TableRow, TextRun, WidthType, patchDocument } from "docx";
+import { ImageRun, Paragraph, PatchType, Table, TableCell, TableRow, TextRun, WidthType, patchDocument } from "docx";
 
-const createTable = (rows: string[][]): Table => {
+import { getImage } from "./getImage";
+
+const regex = /https:\/\/lh3\.googleusercontent\.com\//;
+
+const createTable = async (rows: string[][]): Promise<Table> => {
   return new Table({
     width: {
       size: 100,
       type: WidthType.PERCENTAGE,
     },
-    rows: rows.map((row, index) => {
-      if (index === 0)
+    rows: await Promise.all(
+      rows.map(async (row) => {
         return new TableRow({
-          children: row.map(
-            (cell) =>
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({
-                        text: cell,
-                        bold: true,
-                        size: `${12}pt`,
-                        highlight: "yellow",
-                      }),
-                    ],
-                  }),
-                ],
-              })
-          ),
-        });
-
-      return new TableRow({
-        children: row.map(
-          (cell) =>
-            new TableCell({
-              children: [
-                new Paragraph({
+          children: await Promise.all(
+            row.map(async (cell) => {
+              if (regex.test(cell)) {
+                const { imageArrayBuffer, width, height } = await getImage(cell, true);
+                return new TableCell({
                   children: [
-                    new TextRun({
-                      text: cell,
-                      size: `${12}pt`,
-                      highlight: "yellow",
+                    new Paragraph({
+                      children: [
+                        new ImageRun({
+                          data: imageArrayBuffer,
+                          transformation: { width: width, height: height },
+                        }),
+                      ],
                     }),
                   ],
-                }),
-              ],
+                });
+              } else
+                return new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: cell,
+                          size: `${12}pt`,
+                          highlight: "yellow",
+                        }),
+                      ],
+                    }),
+                  ],
+                });
             })
-        ),
-      });
-    }),
+          ),
+        });
+      })
+    ),
   });
 };
 
@@ -57,7 +58,7 @@ export const replaceTablesValues = async (
   const patches = {};
   for (const [key, value] of Object.entries(tablesVariables)) {
     if (value) {
-      patches[key] = { type: PatchType.DOCUMENT, children: [createTable(value)] };
+      patches[key] = { type: PatchType.DOCUMENT, children: [await createTable(value)] };
     } else {
       patches[key] = {
         type: PatchType.PARAGRAPH,
