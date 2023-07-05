@@ -19,7 +19,9 @@ export const getRows = (
   for (let row = Number(rowStart); row <= Number(rowEnd); row++) {
     const currentRow: string[] = [];
     for (let column = Number(columnStart); column <= Number(columnEnd); column++) {
-      currentRow.push(table.rows[row].cells[column].innerText);
+      const cellTable = table.rows[row].cells[column];
+      if (cellTable) currentRow.push(cellTable.innerText);
+      else currentRow.push("");
     }
     if (currentRow.length && currentRow.join("")) {
       rows.push(currentRow);
