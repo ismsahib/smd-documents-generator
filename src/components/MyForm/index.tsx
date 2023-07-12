@@ -5,6 +5,7 @@ import PizZip from "pizzip";
 import React, { ChangeEvent, FC, FormEvent, useState } from "react";
 import { Alert, Button, Form, Spinner } from "react-bootstrap";
 
+import Instruction from "../Instruction";
 import MyModal from "../MyModal";
 import { generateFileDocxTemplater } from "@root/utils/generateFileDocxTemplater";
 import { getSheetsID } from "@root/utils/getSheetsID";
@@ -18,6 +19,7 @@ const MyForm: FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [loadingFileStatus, setLoadingFileStatus] = useState(false);
   const [modalShow, setModalShow] = useState(false);
+  const [instructionShow, setInstructionShow] = useState(false);
 
   const handleChangeLink = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -82,7 +84,12 @@ const MyForm: FC = () => {
           <Form.Label>Шаблон:</Form.Label>
           <Form.Control type="file" accept=".docx, .doc" onChange={handleChangeFile} />
         </Form.Group>
-        <div className="mb-3 d-flex justify-content-end">
+        <div className="mb-3 d-flex justify-content-between gap-3">
+          <div className="d-flex flex-column gap-3 col-md-3">
+            <Button variant="primary" onClick={() => setInstructionShow(true)}>
+              Документация для платформы
+            </Button>
+          </div>
           <div className="d-flex flex-column gap-3 col-md-3">
             <Button variant="primary" disabled={loadingFileStatus} onClick={handleGenerateFile}>
               {loadingFileStatus ? (
@@ -110,6 +117,7 @@ const MyForm: FC = () => {
         </Alert>
       )}
       {modalShow && <MyModal modalShow={modalShow} setModalShow={setModalShow} modalData={resultDoc} />}
+      {instructionShow && <Instruction modalShow={instructionShow} setModalShow={setInstructionShow} />}
     </>
   );
 };

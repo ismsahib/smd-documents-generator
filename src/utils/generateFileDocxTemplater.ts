@@ -1,6 +1,7 @@
 import { getParameters } from "./getParameters";
 import { getTable } from "./getTable";
 import { getVariablesObject } from "./getVariablesObject";
+import { replaceDataRowsValues } from "./replaceDataRowsValues";
 import { replaceImagesValues } from "./replaceImagesValues";
 import { replaceTablesValues } from "./replaceTablesValues";
 import { replaceTextsValues } from "./replaceTextsValues";
@@ -20,6 +21,10 @@ export const generateFileDocxTemplater = async (id: string, fileDoc: ArrayBuffer
     resultDocx
       ? (resultDocx = await replaceTablesValues(resultDocx, variables.tables))
       : (resultDocx = await replaceTablesValues(fileDoc, variables.tables));
+  if (variables.dataRows)
+    resultDocx
+      ? (resultDocx = await replaceDataRowsValues(resultDocx, variables.dataRows))
+      : (resultDocx = await replaceDataRowsValues(fileDoc, variables.dataRows));
 
   if (resultDocx) return resultDocx;
   else return new Blob([fileDoc]);

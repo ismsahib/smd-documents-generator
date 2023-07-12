@@ -2,14 +2,14 @@ import { PatchType, TextRun, patchDocument } from "docx";
 
 import { createTable } from "./createDocxTable";
 
-export const replaceTablesValues = async (
+export const replaceDataRowsValues = async (
   fileDoc: Blob | ArrayBuffer,
-  tablesVariables: Record<string, string[][] | undefined>
+  dataRowsVariables: Record<string, string[][] | undefined>
 ): Promise<Blob> => {
   const patches = {};
-  for (const [key, value] of Object.entries(tablesVariables)) {
+  for (const [key, value] of Object.entries(dataRowsVariables)) {
     if (value) {
-      patches[key] = { type: PatchType.DOCUMENT, children: [await createTable(value, true, true)] };
+      patches[key] = { type: PatchType.DOCUMENT, children: [await createTable(value, false, false)] };
     } else {
       patches[key] = {
         type: PatchType.PARAGRAPH,

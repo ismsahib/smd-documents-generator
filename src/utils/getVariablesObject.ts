@@ -10,15 +10,19 @@ export const getVariablesObject = (
     texts: Set<string> | undefined;
     images: Set<string> | undefined;
     tables: Set<string> | undefined;
+    dataRows: Set<string> | undefined;
   }
 ): {
   texts: Record<string, string> | undefined;
   images: Record<string, string | undefined> | undefined;
   tables: Record<string, string[][] | undefined> | undefined;
+  dataRows: Record<string, string[][] | undefined> | undefined;
 } => {
   const texts: { [a: string]: string } = {};
   const images: { [a: string]: string | undefined } = {};
   const tables: { [a: string]: string[][] | undefined } = {};
+  const dataRows: { [a: string]: string[][] | undefined } = {};
+
   const maxRows = table.tBodies[0].rows.length;
   const maxCells = table.rows[0].cells.length - 1;
 
@@ -69,9 +73,24 @@ export const getVariablesObject = (
       else tables[key] = undefined;
     });
   }
+
+  if (parameters.dataRows) {
+    parameters.dataRows.forEach((parameter) => {
+      const key = (parameter.match(regexDocxParameter) as RegExpMatchArray)[1];
+      const keyArray = key.split("-");
+      const columnStart = keyArray[2];
+      const rowStart = keyArray[3];
+      const columnEnd = keyArray[4];
+      const rowEnd = keyArray[5];
+      const value = getRows(table, columnStart, rowStart, columnEnd, rowEnd);
+      if (value) dataRows[key] = value;
+      else dataRows[key] = undefined;
+    });
+  }
   return {
     texts: Object.keys(texts).length ? texts : undefined,
     images: Object.keys(images).length ? images : undefined,
     tables: Object.keys(tables).length ? tables : undefined,
+    dataRows: Object.keys(dataRows).length ? dataRows : undefined,
   };
 };
