@@ -82,6 +82,7 @@ export const getVariablesObject = (
       const rowStart = keyArray[3];
       const columnEnd = keyArray[4];
       const rowEnd = keyArray[5];
+      if (columnStart !== columnEnd) dataRows[key] = undefined;
       const value = getRows(table, columnStart, rowStart, columnEnd, rowEnd);
       if (value) dataRows[key] = value;
       else dataRows[key] = undefined;
