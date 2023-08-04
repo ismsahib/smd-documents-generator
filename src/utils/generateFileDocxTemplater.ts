@@ -56,7 +56,14 @@ export const generateFileDocxTemplater = async (id: string, fileDoc: ArrayBuffer
   const parameters = getParameters(text);
   const variables = await collectVariables(parameters, id);
 
-  if (variables.texts) resultDocx = replaceTextsValues(fileDoc, variables.texts);
+  if (variables.texts) resultDocx = replaceTextsValues(fileDoc, variables.texts, { start: "{<", end: ">}" });
+  if (variables.texts)
+    resultDocx
+      ? (resultDocx = replaceTextsValues(await resultDocx.arrayBuffer(), variables.texts, {
+          start: "{&lt;",
+          end: "&gt;}",
+        }))
+      : (resultDocx = replaceTextsValues(fileDoc, variables.texts, { start: "{&lt;", end: "&gt;}" }));
   if (variables.images)
     resultDocx
       ? (resultDocx = await replaceImagesValues(resultDocx, variables.images))

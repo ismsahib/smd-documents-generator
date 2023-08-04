@@ -1,6 +1,7 @@
 import { getRows } from "./getRows";
 
 const regexTextParameter = /{<([\w\d-]+)>}/;
+const regexTextReserveParameter = /{&lt;([\w\d-]+)&gt;}/;
 const regexImportTextParameter = /{<([\w\d-]+@import\((\d+),(\d+)\))>}/;
 const regexDocxParameter = /{{([\w\d-]+)}}/;
 const regexImportDocxParameter = /{{([\w\d-]+@import\((\d+),(\d+)\))}}/;
@@ -33,7 +34,8 @@ export const getVariablesObject = (
   if (parameters.texts) {
     parameters.texts.forEach((parameter) => {
       const key = ((parameter.match(regexTextParameter) as RegExpMatchArray) ||
-        (parameter.match(regexImportTextParameter) as RegExpMatchArray))[1];
+        (parameter.match(regexImportTextParameter) as RegExpMatchArray) ||
+        (parameter.match(regexTextReserveParameter) as RegExpMatchArray))[1];
       const keyArray = key.split("@import")[0].split("-");
       const cell = keyArray[1];
       const row = keyArray[2];
