@@ -1,8 +1,13 @@
 import { getRows } from "./getRows";
 
 const regexTextParameter = /{<([\w\d-]+)>}/;
+const regexTextReserveParameter = /{&lt;([\w\d-]+)&gt;}/;
+const regexImportTextParameter = /{<([\w\d-]+@import\((\d+),(\d+)\))>}/;
 const regexDocxParameter = /{{([\w\d-]+)}}/;
+const regexImportDocxParameter = /{{([\w\d-]+@import\((\d+),(\d+)\))}}/;
 const regexImageSrc = /src="(.*?)"/;
+
+// учесть параметры с @import
 
 export const getVariablesObject = (
   table: HTMLTableElement,
@@ -28,8 +33,10 @@ export const getVariablesObject = (
 
   if (parameters.texts) {
     parameters.texts.forEach((parameter) => {
-      const key = (parameter.match(regexTextParameter) as RegExpMatchArray)[1];
-      const keyArray = key.split("-");
+      const key = ((parameter.match(regexTextParameter) as RegExpMatchArray) ||
+        (parameter.match(regexImportTextParameter) as RegExpMatchArray) ||
+        (parameter.match(regexTextReserveParameter) as RegExpMatchArray))[1];
+      const keyArray = key.split("@import")[0].split("-");
       const cell = keyArray[1];
       const row = keyArray[2];
       if (Number(cell) > 0 && Number(cell) <= maxCells && Number(row) > 0 && Number(row) <= maxRows) {
@@ -48,8 +55,9 @@ export const getVariablesObject = (
 
   if (parameters.images) {
     parameters.images.forEach((parameter) => {
-      const key = (parameter.match(regexDocxParameter) as RegExpMatchArray)[1];
-      const keyArray = key.split("-");
+      const key = ((parameter.match(regexDocxParameter) as RegExpMatchArray) ||
+        (parameter.match(regexImportDocxParameter) as RegExpMatchArray))[1];
+      const keyArray = key.split("@import")[0].split("-");
       const cell = keyArray[2];
       const row = keyArray[3];
       if (Number(cell) > 0 && Number(cell) <= maxCells && Number(row) > 0 && Number(row) <= maxRows) {
@@ -62,8 +70,9 @@ export const getVariablesObject = (
 
   if (parameters.tables) {
     parameters.tables.forEach((parameter) => {
-      const key = (parameter.match(regexDocxParameter) as RegExpMatchArray)[1];
-      const keyArray = key.split("-");
+      const key = ((parameter.match(regexDocxParameter) as RegExpMatchArray) ||
+        (parameter.match(regexImportDocxParameter) as RegExpMatchArray))[1];
+      const keyArray = key.split("@import")[0].split("-");
       const columnStart = keyArray[2];
       const rowStart = keyArray[3];
       const columnEnd = keyArray[4];
@@ -76,7 +85,8 @@ export const getVariablesObject = (
 
   if (parameters.dataRows) {
     parameters.dataRows.forEach((parameter) => {
-      const key = (parameter.match(regexDocxParameter) as RegExpMatchArray)[1];
+      const key = ((parameter.match(regexDocxParameter) as RegExpMatchArray) ||
+        (parameter.match(regexImportDocxParameter) as RegExpMatchArray))[1];
       const keyArray = key.split("-");
       const columnStart = keyArray[2];
       const rowStart = keyArray[3];
@@ -88,6 +98,7 @@ export const getVariablesObject = (
       else dataRows[key] = undefined;
     });
   }
+
   return {
     texts: Object.keys(texts).length ? texts : undefined,
     images: Object.keys(images).length ? images : undefined,
