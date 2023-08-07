@@ -8,7 +8,7 @@ export const replaceTablesValues = async (
 ): Promise<Blob> => {
   const patches = {};
   for (const [key, value] of Object.entries(tablesVariables)) {
-    if (value) {
+    if (value?.length) {
       patches[key] = { type: PatchType.DOCUMENT, children: [await createTable(value, true, true)] };
     } else {
       patches[key] = {
