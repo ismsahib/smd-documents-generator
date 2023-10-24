@@ -43,7 +43,7 @@ const collectVariables = async (parameters: { [a: string]: TParameters }, id: st
   const arrayTables = dataArray.map((item) => item.table);
 
   const results = await Promise.all(arrayTables);
-  const variables = dataArray.reduce(
+  const variables: { [a: string]: any } = dataArray.reduce(
     (result, item, index) => _.merge(result, getVariablesObject(results[index], item.data)),
     {}
   );
