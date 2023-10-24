@@ -7,7 +7,7 @@ const MAX_HEIGHT = 100;
 export const getImage = async (imageUrl: string, resize: boolean) => {
   const widthAndHeight: { width: number; height: number } = { width: 100, height: 100 };
   const bodyURL = imageUrl.split("=")[0];
-  const response = await fetch(bodyURL);
+  const response = await fetch(`https://smd-documents-generator-server.vercel.app/getImageData?url=${bodyURL}`);
   const imageBlob = await response.blob();
   const imageArrayBuffer = await imageBlob.arrayBuffer();
   await new Promise((res, rej) => {

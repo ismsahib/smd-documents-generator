@@ -2,8 +2,6 @@ import { BorderStyle, ImageRun, Paragraph, Table, TableCell, TableRow, TextRun, 
 
 import { getImage } from "./getImage";
 
-const regex = /https:\/\/lh3\.googleusercontent\.com\//;
-
 export const createTable = async (rows: string[][], width: boolean, borders: boolean): Promise<Table> => {
   return new Table({
     width: width
@@ -17,7 +15,7 @@ export const createTable = async (rows: string[][], width: boolean, borders: boo
         return new TableRow({
           children: await Promise.all(
             row.map(async (cell) => {
-              if (regex.test(cell)) {
+              if (cell.startsWith("https")) {
                 const { imageArrayBuffer, width, height } = await getImage(cell, true);
                 return new TableCell({
                   children: [
